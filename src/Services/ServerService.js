@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const addServer = async(data)=>{
-    const response =  await axios.post('/',data)
+    const response =  await axios.post('/api/add-server',data)
     return response.data;
 }
 

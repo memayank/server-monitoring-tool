@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const routes = require('./routes/routes')
 const app = express();
 
 //connection with mongodb
@@ -7,6 +8,9 @@ mongoose.connect('mongodb://localhost:27017/ine')
 mongoose.connection.on("connected",()=>{
     console.log("connected to mongodb")
 })
+
+app.use('/api', routes)
+
 
 app.use(express.json())
 
