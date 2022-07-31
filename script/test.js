@@ -1,24 +1,23 @@
+const moment = require('moment');
 const MetricModel = require('../models/metric-model');
 
-const moment = require('moment');
+const mongoose = require('mongoose');
 
-const getMetricData = async(req,res)=>{
+mongoose.connect('mongodb://localhost:27017/ine')
+mongoose.connection.on("connected",()=>{
+    console.log("connected to mongodb")
+})
+
+
+const test = async ()=>{
     try{
-    
-        let startTime = moment().utc().subtract(6, "hours").toDate();
+        const startTime = moment().utc().subtract(6, "hours").toDate();
 
-        let endTime = moment().utc().toDate();
+        const endTime = moment().utc().toDate();
 
-        if(req.body.from){
-            startTime = moment(req.body.from).utc().toDate();
-        }
-        if(req.body.to){
-            endTime = moment(req.body.to).utc().toDate();
-        }
         const difference = moment(endTime).diff(startTime, 'minute');
-    
 
-        const interval = difference/50;
+        const interval = difference/20;
         const metricData = await MetricModel.aggregate([
             {
                 $match: {
@@ -58,50 +57,17 @@ const getMetricData = async(req,res)=>{
                         $first: "$date"
                     }
                 }
-            },
-            {
-                $sort: {
-                    date: 1
-                }
             }
         ])
-        let resdata = {};
-        metricData.forEach(data=>{
-            if(!resdata[data._id.ip_address]){
-                resdata[data._id.ip_address] = {
-                    labels :  [], 
-                    cpu : [], 
-                    disk  : [],
-                    memory :[] 
-                }
-            }
-            resdata[data._id.ip_address].labels.push(moment(data.date).format('LT'));
-            resdata[data._id.ip_address].cpu.push(data.cpu);
-            resdata[data._id.ip_address].disk.push(data.disk);
-            resdata[data._id.ip_address].memory.push(data.memory);
-        })
-        console.log(resdata)
-        return res.json({
-            status: true,
-            resdata
-        })
+
+        return metricData;
     }catch(err){
-        console.log(err)
-        return res.json({
-            status: false
-        })
+        console.log(err);
     }
 }
 
-const addMetricData = (req,res)=>{
-    try{
-
-    }catch(err){
-
-    }
-}
-
-module.exports = {
-    getMetricData,
-    addMetricData
-}
+test().then(data=>{
+    console.log(data)
+}).catch(err=>{
+    console.log(err)
+})

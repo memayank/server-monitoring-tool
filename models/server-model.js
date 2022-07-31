@@ -6,7 +6,7 @@ const ServerSchema = new mongoose.Schema({
         require: true
     },
     server_name: {
-        type: Date,
+        type: String,
         require: true
     },
     status: {

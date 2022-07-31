@@ -1,0 +1,13 @@
+.carousel-control-prev-icon{
+    background-color: black;
+}
+.carousel-control-next-icon{
+    background-color: black;
+}
+
+.carousel button{
+    background-color: black !important;
+}
+.carousel-container{
+    height: 100px !important;
+}

@@ -1,4 +1,5 @@
 import React,{useState} from "react";
+import ServerService from "../../Services/ServerService";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Label, Input,FormFeedback, FormText, FormGroup } from "reactstrap";
 
 const AddServerData = (props) => {
@@ -16,10 +17,13 @@ const AddServerData = (props) => {
   const toggle = () => setModal(!modal);
 
   const handleInputChange = (event) =>{
+    console.log(serverDetails)
     setServerDetails({
+        ...serverDetails,
         [event.target.name]: event.target.value
     })
     setErrors({
+        ...errors,
         [event.target.name]: ""
     })
   }
@@ -43,10 +47,13 @@ const AddServerData = (props) => {
     return isValid;
   }
 
-  const handleSubmit = ()=>{
+  const handleSubmit = async()=>{
     const isValid = validateForm()
     if(isValid){
         //call api to create new server
+        const response = await ServerService.addServer(serverDetails);
+        props.handleAddButtonClick();
+        console.log(response);
     }
   }
   return (
