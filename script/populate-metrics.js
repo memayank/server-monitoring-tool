@@ -1,47 +1,36 @@
+const dynamoDbService = require('../services/dynamodb-service');
 const moment = require('moment');
-const MetricModel = require('../models/metric-model');
+const { v4: uuidv4 } = require('uuid');
 
-const mongoose = require('mongoose');
+const populateMetrics = async()=>{
+    try{
 
-mongoose.connect('mongodb://localhost:27017/ine-db')
-mongoose.connection.on("connected",()=>{
-    console.log("connected to mongodb")
-})
-const storeData = async()=>{
-    try{ 
-        const metric = new MetricModel({
-            ip_address: "172.168.144.72",
-            date: moment().utc().startOf("minute").toDate(),
-            cpu_useage: Math.floor(Math.random()*50)+50,
-            memory_useage: Math.floor(Math.random()*50)+50,
-            disk_useage: Math.floor(Math.random()*50)+50
-        })
-        await metric.save()
-        return metric;
+        const date = 1660381320;
+        const ITERATION_COUNT = 3*24*60;
+
+        const servers = ["172.168.0.5"];
+
+        for(const server of servers){
+            for(let i =0 ;i<ITERATION_COUNT;i++){
+                await dynamoDbService.addMetricDetails({
+                    id:uuidv4(),
+                    ip: server,
+                    created_at: (date +i*60),
+                    cpu: Math.floor(Math.random()*500)+500,
+                    memory: Math.floor(Math.random()*50)+50,
+                    disk: Math.floor(Math.random()*50)+50
+                })
+                console.log(server, i);
+            }
+        }
+        return "done";
     }catch(err){
         console.log(err);
-        return false
     }
 }
 
-const populate = async()=>{
-    try{
-        for(let i=0;i<100;i++){
-            setTimeout(()=>{
-
-                storeData().then(data=>{
-                    console.log("Created new record", data)
-                })
-            },60000*i)
-        }
-    }catch(err){
-        return false;
-    }
-}
-
-
-populate().then(data=>{
-    console.log(data)
+populateMetrics().then(data=>{
+    console.log(data);
 }).catch(err=>{
     console.log(err);
 })

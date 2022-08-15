@@ -1,18 +1,24 @@
 import React,{useState} from "react";
 import ServerService from "../../Services/ServerService";
 import { Button, Modal, ModalHeader, ModalBody, ModalFooter, Label, Input,FormFeedback, FormText, FormGroup } from "reactstrap";
+import Select from 'react-select';
 
 const AddServerData = (props) => {
   const [modal, setModal] = useState(true);
+  const statusOptions = [
+    { value: true, label: 'Active' },
+    { value: false, label: 'Inactive' }
+  ];
 
   const [serverDetails, setServerDetails] = useState({
-    serverName: "",
-    ipAddress: ""
+    name: "",
+    ip: "",
+    status: true
   })
 
   const [errors, setErrors] = useState({
-    serverName: "",
-    ipAddress: ""
+    name: "",
+    ip: ""
   })
   const toggle = () => setModal(!modal);
 
@@ -28,20 +34,27 @@ const AddServerData = (props) => {
     })
   }
 
+  const onStatusChange = (event)=>{
+    setServerDetails({
+      ...serverDetails,
+      status:event.value
+    })
+  }
+
   const validateForm = () =>{
     let isValid = true;
-    if(!serverDetails.serverName){
+    if(!serverDetails.name){
         isValid = false;
         setErrors({
             ...errors,
-            serverName: "Server Name is required"
+            name: "Server Name is required"
         })
     }
-    if(!serverDetails.ipAddress){
+    if(!serverDetails.ip){
         isValid = false;
         setErrors({
             ...errors,
-            ipAddress: "Server Name is required"
+            ip: "Server Name is required"
         })
     }
     return isValid;
@@ -65,13 +78,13 @@ const AddServerData = (props) => {
             <FormGroup>
                 <Label>Server Name</Label>
                 <Input
-                    name="serverName"
+                    name="name"
                     type="text"
                     onChange={handleInputChange}
-                    invalid ={errors.serverName? true :false}
+                    invalid ={errors.name? true :false}
                 />
                 <FormFeedback>
-                    {errors.serverName}
+                    {errors.name}
                 </FormFeedback>
 
             </FormGroup>
@@ -79,16 +92,27 @@ const AddServerData = (props) => {
             <FormGroup>
                 <Label>Server IP</Label>
                 <Input
-                    name="ipAddress"
+                    name="ip"
                     type="text"
                     onChange={handleInputChange}
-                    invalid ={errors.ipAddress? true :false}
+                    invalid ={errors.ip? true :false}
                 />
                 <FormFeedback>
-                        {errors.ipAddress}
+                        {errors.ip}
                 </FormFeedback>
             </FormGroup>
-
+            <FormGroup>
+                <Label>Server Status</Label>
+                <Select
+                    name="status"
+                    onChange={onStatusChange}
+                    options={statusOptions}
+                />
+                <FormFeedback>
+                        {errors.ip}
+                </FormFeedback>
+            </FormGroup>
+            
         </ModalBody>
         <ModalFooter>
           <Button color="primary" onClick={handleSubmit}>

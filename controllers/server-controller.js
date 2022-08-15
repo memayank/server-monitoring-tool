@@ -1,14 +1,17 @@
 const ServerModel = require('../models/server-model');
+const dynamoDbService = require('../services/dynamodb-service');
+const { v4: uuidv4 } = require('uuid');
 const moment = require('moment');
 const addServer = async(req,res)=>{
     try{
-        console.log(req.body)
-        const server = new ServerModel({
-            ip_address: req.body.ipAddress,
-            server_name: req.body.serverName,
-            date: moment().utc().toDate()
+        const response = await dynamoDbService.addOrUpdateServer({
+            id:uuidv4(),
+            ip: req.body.ip,
+            name: req.body.name,
+            status: req.body.status,
+            date: moment().utc().unix(),
+            deleted: false
         })
-        await server.save();
         return res.json({
             status: true,
             msg: "New server added"
@@ -23,18 +26,18 @@ const addServer = async(req,res)=>{
 }
 
 const editServerDetails = async(req,res)=>{
-    try{
-        console.log(req.body);
-        const server = await ServerModel.findOne({
-            _id: req.body.id
+    try{    
+        // console.log("editServerDetails ", req.body);
+
+
+        const server = await dynamoDbService.addOrUpdateServer({
+            id:req.body.id,
+            ip: req.body.ip,
+            name: req.body.name,
+            status: req.body.status,
+            date:req.body.date,
+            deleted: false
         })
-        if(req.body.serverName){
-            server.server_name = req.body.serverName;
-        }
-        if(req.body.ipAddress){
-            server.ip_address = req.body.ipAddress;
-        }
-        await server.save();
         return res.json({
             status: true,
             msg: "Server details updated"
@@ -49,14 +52,19 @@ const editServerDetails = async(req,res)=>{
 
 const getServersList = async(req,res)=>{
     try{
-
-        const servers = await ServerModel.find({})
+        const servers = await dynamoDbService.getServersList();
+        // console.log(servers)
+        if(servers){
+            return res.json({
+                status: true,
+                servers
+            })
+        }
         return res.json({
             status: true,
-            servers
+            servers:[]
         })
     }catch(err){
-        
         return res.json({
             staus: false,
             msg: "Unable to add new server"
@@ -66,11 +74,17 @@ const getServersList = async(req,res)=>{
 
 const deleteServer = async(req,res)=>{
     try{
-        const server = await ServerModel.findOne({
-            _id: req.body.id
+        // console.log(req.body,"delete")
+        const server = await dynamoDbService.addOrUpdateServer({
+            id:req.body.id,
+            ip: req.body.ip,
+            name: req.body.name,
+            status: req.body.status,
+            date: req.body.date,
+            deleted: true
         })
-        server.status=false;
-        await server.save();
+        // console.log(server)
+
         return res.json({
             status: true,
             msg: "Server deleted"

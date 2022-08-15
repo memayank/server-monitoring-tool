@@ -31,7 +31,6 @@ const items = [
 const MetricGraphsCarousal = (props) => {
     const [activeIndex, setActiveIndex] = useState(0);
     const [animating, setAnimating] = useState(false);
-
     
     const onExiting = ()=> {
       // setAnimating(true);

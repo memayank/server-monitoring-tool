@@ -41,8 +41,10 @@ const ServerList = () => {
     setShowEditServerForm(!showEditServerForm);
   }
 
-  const handleDeleteButtonClick = async(id)=>{
-    const response = await ServerService.deleteServer({id});
+  const handleDeleteButtonClick = async(serverDetails)=>{
+    const response = await ServerService.deleteServer({
+      ...serverDetails
+    });
     if(response.status){
       setUpdateList(!updateList)
     }
@@ -80,26 +82,28 @@ const ServerList = () => {
         </thead>
         <tbody>
           {
-            serverList.map(server=>
-              <tr>
-                <td>{server.server_name}</td>
-                <td>{server.ip_address}</td>
-                <td>{server.date}</td>
-                <td>{server.status? "Active": "Inactive"}</td>
-                <td>
-                  <Button className=" btn btn-primary" onClick={()=>{handleEditButtonClick({
-                    id: server._id,
-                    serverName: server.server_name,
-                    ipAddress: server.ip_address
-                  })}}>Edit</Button>
-                  <Button className="btn btn-danger"onClick={()=>{handleDeleteButtonClick(server._id)}}>Delete</Button>
-                </td>
-              </tr>
-            )
+            serverList.map((server)=>{
+              return !server.deleted ?  <tr>
+              <td>{server.name}</td>
+              <td>{server.ip}</td>
+              <td>{server.date}</td>
+              <td>{server.status? "Active": "Inactive"}</td>
+              <td>
+                <Button className=" btn btn-primary" onClick={()=>{handleEditButtonClick({
+                  id: server.id,
+                  name: server.name,
+                  ip: server.ip,
+                  status: server.status,
+                  date: server.date
+                })}}>Edit</Button>
+                <Button className="btn btn-danger"onClick={()=>{handleDeleteButtonClick(server)}}>Delete</Button>
+              </td>
+            </tr>:null
+            })
           }
         </tbody>
       </Table>
-      </>
+    </>
   );
 };
 
